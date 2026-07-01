@@ -1,7 +1,7 @@
 import asyncio
 import sys
 
-# ✅ Fix Windows event loop issue
+
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -9,14 +9,14 @@ import streamlit as st
 from langchain_mistralai import ChatMistralAI
 import os
 
-# ✅ Initialize the model safely
+
 model = ChatMistralAI(
     model="mistral-large-latest",
     api_key=os.getenv("MISTRAL_API_KEY"),
     system_message="You are an AI Gym Trainer. Always give safe, personalized advice about fitness, nutrition, and workouts."
 )
 
-# 🎨 Professional theme setup
+
 st.set_page_config(
     page_title="AI Gym Trainer",
     page_icon="💪",
@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 🧍 User profile setup
+
 def user_profile():
     st.sidebar.title("🏋️ User Profile")
     st.sidebar.info("Fill in your details for a personalized fitness plan:")
@@ -63,7 +63,7 @@ def user_profile():
         st.session_state.messages = []
         st.success("✅ Profile saved! You can now chat with your AI Trainer.")
 
-# 💬 Chat interface
+
 def chat_interface(model):
     st.markdown("<h1 style='text-align: center; color: #2E86C1;'>💬 Chat with your AI Gym Trainer</h1>", unsafe_allow_html=True)
     st.write("Ask me anything about fitness, nutrition, or your workout plan!")
@@ -75,12 +75,12 @@ def chat_interface(model):
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Display previous messages
+    
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # Handle new user input
+    
     if prompt := st.chat_input("What would you like to know?"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -103,7 +103,7 @@ def chat_interface(model):
                 st.markdown(f"### 📝 Personalized Plan\n{full_response.content}")
             st.session_state.messages.append({"role": "assistant", "content": full_response.content})
 
-# 🚀 Run the app
+
 if __name__ == "__main__":
     user_profile()
     chat_interface(model)
