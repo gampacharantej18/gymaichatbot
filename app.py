@@ -3,20 +3,20 @@ from langchain_mistralai import ChatMistralAI
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # add this line
-# ─────────────────────────────────────────────
-#  PAGE CONFIG
-# ─────────────────────────────────────────────
+load_dotenv()  
+
+
+
 st.set_page_config(
     page_title="AI Gym Trainer",
-    page_icon="assets/logo.png",  # swap with your own icon path or remove
+    page_icon="assets/logo.png",  
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# ─────────────────────────────────────────────
-#  GLOBAL CUSTOM CSS  –  Classic Professional
-# ─────────────────────────────────────────────
+
+
+
 st.markdown("""
 <style>
 /* ── Google Fonts ── */
@@ -251,9 +251,7 @@ label, .stSelectbox label, .stNumberInput label {
 """, unsafe_allow_html=True)
 
 
-# ─────────────────────────────────────────────
-#  HEADER
-# ─────────────────────────────────────────────
+
 st.markdown("""
 <div class="trainer-header">
     <h1>AI Gym Trainer</h1>
@@ -263,11 +261,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ─────────────────────────────────────────────
-#  SESSION STATE INIT
-# ─────────────────────────────────────────────
 for key, default in {
-    "step": 1,          # 1 = profile form, 2 = goal form, 3 = chat
+    "step": 1,         
     "profile": {},
     "goal": "",
     "messages": [],
@@ -276,10 +271,6 @@ for key, default in {
     if key not in st.session_state:
         st.session_state[key] = default
 
-
-# ─────────────────────────────────────────────
-#  HELPER — build system prompt
-# ─────────────────────────────────────────────
 def build_system_prompt(profile: dict, goal: str) -> str:
     p = profile
     bmi = round(p["weight_kg"] / ((p["height_cm"] / 100) ** 2), 1)
@@ -319,9 +310,7 @@ YOUR RESPONSIBILITIES:
 """
 
 
-# ─────────────────────────────────────────────
-#  STEP INDICATOR HELPER
-# ─────────────────────────────────────────────
+
 def step_indicator(current: int):
     dots = "".join(
         f'<div class="step-dot{"  active" if i == current else ""}"></div>'
@@ -330,9 +319,7 @@ def step_indicator(current: int):
     st.markdown(f'<div class="step-indicator">{dots}</div>', unsafe_allow_html=True)
 
 
-# ─────────────────────────────────────────────
-#  STEP 1 — USER PROFILE FORM
-# ─────────────────────────────────────────────
+
 def render_profile_form():
     step_indicator(1)
     st.markdown("""
@@ -393,9 +380,7 @@ def render_profile_form():
                     st.rerun()
 
 
-# ─────────────────────────────────────────────
-#  STEP 2 — GOAL SELECTION
-# ─────────────────────────────────────────────
+
 def render_goal_form():
     step_indicator(2)
     p = st.session_state.profile
@@ -454,14 +439,11 @@ def render_goal_form():
                 st.rerun()
 
 
-# ─────────────────────────────────────────────
-#  STEP 3 — CHAT INTERFACE
-# ─────────────────────────────────────────────
+
 def render_chat(model):
     p = st.session_state.profile
     bmi = round(p["weight_kg"] / ((p["height_cm"] / 100) ** 2), 1)
 
-    # ── Profile badge ──
     st.markdown(f"""
     <div class="profile-badge">
         <strong style="color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.75rem;">
@@ -479,7 +461,7 @@ def render_chat(model):
 
     st.markdown('<p class="chat-section-title">Your Personalised Training Session</p>', unsafe_allow_html=True)
 
-    # ── Auto-generate initial plan ──
+   
     if not st.session_state.plan_generated:
         system_prompt = build_system_prompt(p, st.session_state.goal)
         initial_prompt = (
@@ -504,7 +486,7 @@ def render_chat(model):
         })
         st.session_state.plan_generated = True
 
-    # ── Render history ──
+    
     for msg in st.session_state.messages:
         if msg["role"] == "assistant":
             with st.chat_message("assistant"):
@@ -513,7 +495,7 @@ def render_chat(model):
             with st.chat_message("user"):
                 st.markdown(msg["content"])
 
-    # ── New message input ──
+    
     if user_input := st.chat_input("Ask a follow-up question about your plan..."):
         st.session_state.messages.append({"role": "user", "content": user_input})
         with st.chat_message("user"):
@@ -540,7 +522,7 @@ def render_chat(model):
             "content": response.content,
         })
 
-    # ── Reset button ──
+    
     st.markdown("<br>", unsafe_allow_html=True)
     col_reset, _ = st.columns([1, 5])
     with col_reset:
@@ -550,9 +532,7 @@ def render_chat(model):
             st.rerun()
 
 
-# ─────────────────────────────────────────────
-#  MAIN ENTRY POINT
-# ─────────────────────────────────────────────
+
 def chat_interface(model):
     if st.session_state.step == 1:
         render_profile_form()
@@ -562,9 +542,7 @@ def chat_interface(model):
         render_chat(model)
 
 
-# ─────────────────────────────────────────────
-#  RUN (if used as standalone)
-# ─────────────────────────────────────────────
+
 if __name__ == "__main__":
     api_key = os.getenv("MISTRAL_API_KEY", "")
     model = ChatMistralAI(
